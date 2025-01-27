@@ -1,9 +1,11 @@
 /* Global Styles */
 body {
     font-family: 'Arial', sans-serif;
-    line-height: 1.6;
+    line-height: 2;
     background-color: #f4f4f4;
-    margin: 0;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin: 10;
     padding: 0;
     color: #333;
 }
@@ -14,20 +16,22 @@ h1, h2 {
 }
 
 h2 {
-    font-size: 2em;
+    font-size: 3em;
     font-weight: bold;
     margin-bottom: 10px;
 }
 
 p {
-    font-size: 1.1em;
+    font-size: 18em;
     margin-bottom: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
     color: #666;
 }
 
 /* Post Content Container */
 .post-content {
-    width: 80%;
+    width: 60%;
     margin: 30px auto;
     background-color: white;
     padding: 30px;

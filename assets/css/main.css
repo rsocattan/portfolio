@@ -11,8 +11,8 @@ html, body, span, applet, object,
 iframe, h1, h2, h3, h4, h5, h6, blockquote,
 pre, abbr, acronym, address, big, cite,
 code, del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var, b,
-u, i, center, dl, dt, dd, ol, ul, li, fieldset,
+small, strike, sub, sup, tt, var, b,
+u, center, dl, dt, dd, ol, ul, li, fieldset,
 form, label, legend, table, caption, tbody,
 tfoot, thead, tr, th, td, article, aside,
 canvas, details, embed,  
@@ -31,6 +31,12 @@ section, summary, time, mark, audio, video {
 article, aside, details, figcaption,
 footer, header, hgroup, menu, nav, section {
 	display: block;}
+i {
+	font-style: italic;
+	white-space: nowrap;
+}
+
+
 
 body {
 	line-height: 1;
@@ -201,7 +207,9 @@ input, select, textarea {
 
 	strong, b {
 		font-weight: 600;
+		white-space: nowrap;
 	}
+	
 
 	em, i {
 		font-style: italic;
@@ -335,6 +343,7 @@ input, select, textarea {
 
 	strong, b {
 		color: #212931;
+		white-space: nowrap;
 	}
 
 	h1, h2, h3, h4, h5, h6 {
@@ -3361,6 +3370,7 @@ input, select, textarea {
 
 		#intro strong, #intro b {
 			color: #ffffff;
+			white-space: nowrap;
 		}
 
 		#intro h1, #intro h2, #intro h3, #intro h4, #intro h5, #intro h6 {

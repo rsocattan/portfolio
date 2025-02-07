@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Forecasting the Exchange Rate</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <script src="htmlwidgets.js"></script>
+    <script src="plotly.js"></script>
+    <script src="typedarray.min.js"></script>
+    <script src="crosstalk.min.js"></script>
+    <script src="jquery.min.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <div id="main">
+        <article id="post3">
+            <h1 class="posts">Forecasting the Exchange Rate</h1>
+            <span class="image main" style="display: block; text-align: center;">
+                <img src="images/er_intro.png" alt="Post Image" style="width: 90%;" />
+                <footer style="text-align: center;">Fig. 0 - Exchange Rate (BRZ/USD) Source: Author with BCB data </a></footer>
+              </span>
+    
+    <!-- See examples for <a href="https://www.bankofengland.co.uk/-/media/boe/files/working-paper/2016/a-dynamic-model-of-financial-balances-for-the-uk.pdf">England</a>, -->
+    
+    
+    <h2>Buy now or latter?</h2> 
+        
+<p>Have you ever wondered if you should buy dollars this month or closer to your trip?</p>
+
+This is a common question for those willing to travel abroad but are unsure whether to buy now or closer to the trip.
+I have myself questioned that and believe me, a few friends too.</p>
+
+<p>The exchange rate can often feel unpredictable, especially in developing economies like Brazil. 
+    Here, it tends to be quite high and may experience structural breaks. 
+    It is also influenced by external dynamics that aren't always tied to local issues.
+    Can we predict what will the ER be like next month? Higher, lower?</p>
+    
+    
+
+<p>This post aims to answer this question:</p>
+    
+<strong> How good are statistical models at inferring the Brazilian Real to US Dollar ratio?</strong></p>
+
+<p>Time series, especially financial ones, are often predicted by market players. 
+    The workhorse of econometrics - the art of modeling the economy - is the so-called Ordinary Least Squares method.</p>
+
+<p>Among the assumptions, this method requires that the errors of your estimate be normally distributed around 0 and constant variance. 
+    If not, then you might have biased or at least inconsistent parameters, and likely misleading confidence intervals and p-values.</p>
+
+<h2><strong>Why garch?</strong></h2>
+<p>In most financial time series, including the exchange, these assumptions are not met: that is, their estimated residuals are not constant, nor present constant variance.</p>
+
+<p>So why not estimate the residuals itself?</p>
+
+<p>This is where the GARCH model comes in. Its basic assumption is that variance is conditional to time. So the variance of the exchange rate today is based on the exchange past variance values and past error.</p>
+
+<p>Think of this: if a variation is time dependent then yesterday’s variance is probably affecting today’s variance. Maybe the variance of the exchange rate two days ago also is still reflected on todays variation.</p>
+
+<p>The GARCH model is basically estimating the weight of past variances and error terms on current variance. Hence we can define the variance today as \( r_t \) as a constant mean \( \mu \) plus a time-dependent error term \( \epsilon_t \):</p>
+
+<p>\[ r_t = \mu + \epsilon_t \]</p>
+
+<p>This error, however, is not constant; it is conditional on time and its previous values such that:</p>
+
+<p>\[ \epsilon_t = \sigma_t z_t, \quad z_t \sim \text{i.i.d. }(0,1) \]</p>
+
+<p>And most importantly, this \( \sigma_t \) - the variance itself - is defined as:</p>
+
+<p>\[ \sigma_t^2 = \omega + \sum_{i=1}^{p} \alpha_i \epsilon_{t-i}^2 + \sum_{j=1}^{q} \beta_j \sigma_{t-j}^2 \]</p>
+
+<p>The weights on this equation are, naturally, the \( \alpha_i \) and \( \beta_j \). Whereas \( \omega \) is a constant intercept</p>
+
+
+<h2>Let’s fit it to the data?</h2>
+
+
+<p>For this post, I have used the Brazilian Real to US Dollar exchange rate. The data is available at the Central Bank of Brazil website.
+     The data is daily and spans from 2024-01-01 until the last available data (2025-01-07) .</p>
+
+
+<p>Since the ER was clearly non stationary AND we are not estimating its level but its variance, we will use the difference daily difference as our estimand \( r_t \).</p>     
+
+</article>
+</div>
+</body>
+
+
+
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+</html>

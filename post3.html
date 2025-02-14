@@ -5,11 +5,16 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="assets/css/main.css">
     <script src="htmlwidgets.js"></script>
-    <script src="plotly.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="typedarray.min.js"></script>
     <script src="crosstalk.min.js"></script>
     <script src="jquery.min.js"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+
+
 </head>
 <body>
     <div id="main">
@@ -25,36 +30,51 @@
     
     <h2>Buy now or latter?</h2> 
         
-<p>Have you ever wondered if you should buy dollars this month or closer to your trip?</p>
+<p>Have you ever wondered if you should buy Dollars or Euros this month? or maybe closer to your trip?</p>
 
 This is a common question for those willing to travel abroad but are unsure whether to buy now or closer to the trip.
-I have myself questioned that and believe me, a few friends too.</p>
+I have questioned that myself a few times, and I'm frequently asked by friends who believe economists should know this kind of stuff (by heart).</p>
 
-<p>The exchange rate can often feel unpredictable, especially in developing economies like Brazil. 
-    Here, it tends to be quite high and may experience structural breaks. 
-    It is also influenced by external dynamics that aren't always tied to local issues.
-    Can we predict what will the ER be like next month? Higher, lower?</p>
+<p>The exchange rate is hardly predictable, especially in developing economies like Brazil. 
+    Sudden shifts in markets' expectations or preferences can lead to strong shifts - up and down - and its trend is marked by structural breaks.
+    This variation, furthermore, is often unrelated to domestic economic fundamentals.
+     Having that said. How unpredictable the exchange rate actually is? What will the ER be like next month? Higher, lower?</p>
     
     
-
-<p>This post aims to answer this question:</p>
+<p>This post aims to answer the following question:</p>
     
 <strong> How good are statistical models at inferring the Brazilian Real to US Dollar ratio?</strong></p>
 
-<p>Time series, especially financial ones, are often predicted by market players. 
-    The workhorse of econometrics - the art of modeling the economy - is the so-called Ordinary Least Squares method.</p>
+<p>Forecasting financial time-series, is crucial for most market players - including financial and non-financial companies- and not just the household trip to Disney.</p>
 
-<p>Among the assumptions, this method requires that the errors of your estimate be normally distributed around 0 and constant variance. 
+The toolkit for estimating financial variables is large. The workhorse of econometrics - the art of modeling the economy - is the so-called Ordinary Least Squares method (OLS). 
+Although not necessarily the most sophisticated, this method commonly employed to analyze structural relations and, hence, predict the behaviour of the dolar or the price-index in the next month.</p>
+
+<p>This method, however, requires that the errors of your estimate be normally distributed around 0 and display constant variance. 
     If not, then you might have biased or at least inconsistent parameters, and likely misleading confidence intervals and p-values.</p>
 
-<h2><strong>Why garch?</strong></h2>
-<p>In most financial time series, including the exchange, these assumptions are not met: that is, their estimated residuals are not constant, nor present constant variance.</p>
+    <p>How to overcome this? </p> 
 
-<p>So why not estimate the residuals itself?</p>
 
-<p>This is where the GARCH model comes in. Its basic assumption is that variance is conditional to time. So the variance of the exchange rate today is based on the exchange past variance values and past error.</p>
+<h2><strong>Choosing the Appropriate Tool</strong></h2>
 
-<p>Think of this: if a variation is time dependent then yesterday’s variance is probably affecting today’s variance. Maybe the variance of the exchange rate two days ago also is still reflected on todays variation.</p>
+<p>When the residuals of your model are not constant, you might want to use a different model. 
+    This is the case of the Generalized Autoregressive Conditional Heteroskedasticity model (GARCH).</p>
+
+<p>The GARCH model is based on the assumption that the variance of the residuals is not constant but conditional on time. 
+    This is especially useful for financial time series, where the variance is likely to be time-dependent. So why not fitting a model for the variance itself?</p>
+
+<p>Let's see how this model works.</p>
+
+<h2>What is the GARCH Model?</h2>
+
+<p>In most financial time series, including the exchange, OLS's required assumptions are not met: that is, their estimated residuals are not constant, and their variance is not constant.
+    This is where the GARCH model comes in. Its basic assumption is that variance is conditional to time. 
+    By assuming a functional relationship between the variance and its past values, the GARCH model can estimate the variance itself. And hence, be used to forecast the exchange rate.</p>
+     </p>
+
+<p>Think of this: if a variation is time-dependent then yesterday’s variance is probably affecting today’s variance. 
+    Maybe the variance of the exchange rate two days ago also is still reflected on todays variation.</p>
 
 <p>The GARCH model is basically estimating the weight of past variances and error terms on current variance. Hence we can define the variance today as \( r_t \) as a constant mean \( \mu \) plus a time-dependent error term \( \epsilon_t \):</p>
 
@@ -66,7 +86,9 @@ I have myself questioned that and believe me, a few friends too.</p>
 
 <p>And most importantly, this \( \sigma_t \) - the variance itself - is defined as:</p>
 
-<p>\[ \sigma_t^2 = \omega + \sum_{i=1}^{p} \alpha_i \epsilon_{t-i}^2 + \sum_{j=1}^{q} \beta_j \sigma_{t-j}^2 \]</p>
+<p>\[ \sigma_t^2 = \omega + \sum_{i=1}^{p} \alpha_i \epsilon_{t-i}^2 + \sum_{j=1}^{q}\beta_j\sigma_{t-j}^2 \]></h2>
+
+Notice that apart from past variance, the error itself is also included in the equation, meaning that past (squared) shocks, still influence current variance.
 
 <p>The weights on this equation are, naturally, the \( \alpha_i \) and \( \beta_j \). Whereas \( \omega \) is a constant intercept</p>
 
@@ -78,7 +100,76 @@ I have myself questioned that and believe me, a few friends too.</p>
      The data is daily and spans from 2024-01-01 until the last available data (2025-01-07) .</p>
 
 
-<p>Since the ER was clearly non stationary AND we are not estimating its level but its variance, we will use the difference daily difference as our estimand \( r_t \).</p>     
+<p>Since the ER was clearly non stationary AND we are not estimating its level but its variance, we will use the daily difference as our estimand \( \Delta r_t \).</p>   
+
+<h3>Data Visualization</h3>
+
+<p>First, let's have a look at the data over time, and how its variance behaves.</p>
+
+
+<a name="er_eda_1"></a>
+<div align="center">
+    <figure>
+        <iframe src="images/er_eda_1.png" height="600" width="1230" style="display:block;"></iframe>
+        <figcaption><strong>Fig. 1 - Exchange Rate Variation and Standard Deviation (%/Units)</strong></figcaption>
+    </figure>
+</div>
+
+
+It is clear that:
+<enumerate>
+    <li> The exchange rate is non-stationary, with a clear upward trend - non constant mean</li>
+    <li> The difference of the exchange rate is also non-stationary, with a clear upward trend</li>
+    <li> The standard deviation of the exchange rate is not constant, with what looks like a upward trend</li>
+
+This means that the GARCH approach does seem appropriate for the data at hand.
+ But how good can a model soleley based on past variances and errors be at predicting the exchange rate?</p>
+
+
+ When setting up the model, we have to define the number of lags for the variance and the error terms. 
+ This is done by setting the \( p \) and \( q \) parameters. I have created an algorithm to estimate the combination
+ of different possibilities of values (1, 10 for each parameter) and selected the one which minimized errors (residuals).
+
+ <p> Since our goal is to forecast UNSEEN data, I have trained a model with half of the observations (until 2025-06-30).
+    The models's results are presented below:</p>
+</p>
+ 
+<a name="garch_results"></a>
+<div>
+    <figure style="text-align: center; margin: 0;">
+        <iframe src="images/garch_results.png" height="500" width="630" ></iframe>
+        <figcaption style="margin-top: 5px; font-size: 16px;"><strong>Fig. 2 - GARCH Model Results</strong></figcaption>
+    </figure>
+</div>
+
+We can see that past error terms are present at one level , our \( \alpha_1 \) coefficient,
+ whereas past variances are represented by one leveltoo, our \( \beta_1 \) coefficient. 
+ Despite the error minimization specification, we can see that  \beta_1 is not statistically significant.
+
+<p>A practical way to validate this result is by simply plotting the autocorrelation function (ACF) of the exchange rate variance change itself.
+ This function provides the correlation between a value in t against a value in t-1, t-2, t-3, and so on. 
+ If we do see a correlation, then a GARCH model is likely a good specification:</p>
+
+ <a name="garch_results"></a>
+ <div align="left">
+     <figure style="text-align: center; margin: 2;">
+         <img src="images/acf.png" height="500" width="630" style="display: block; margin: 0 auto;">
+         <figcaption style="margin-top: 5px; font-size: 16px;"><strong>Fig. 3 - ER Variance Autocorrelation Function</strong></figcaption>
+     </figure>
+ </div>
+ 
+
+
+As expected, the ACF shows a clear correlation between the exchange rate at time t-1, and t-2,
+ indicating the robustnessess of GARCH model's result. 
+
+<p> So far so good. We saw that the exchange rate variation has a non stationary behavior, as well as its variance.
+    We fitted a GARCH model to the data and found that past variances and errors do influence current variance, specially in the shor term (t-1)
+Finally, we saw that this result was corroborated by the ACF function. What about the model's hability to forecast?</p>
+</p> 
+ 
+
+ 
 
 </article>
 </div>

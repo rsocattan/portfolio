@@ -30,7 +30,7 @@
     
     <h2>Buy now or latter?</h2> 
         
-<p>Have you ever wondered if you should buy Dollars or Euros this month? or maybe closer to your trip?</p>
+<p>Have you ever wondered if you should buy Dollars or Euros this month? Or maybe someday closer to your trip?</p>
 
 This is a common question for those willing to travel abroad but are unsure whether to buy now or closer to the trip.
 I have questioned that myself a few times, and I'm frequently asked by friends who believe economists should know this kind of stuff (by heart).</p>
@@ -68,27 +68,28 @@ Although not necessarily the most sophisticated, this method commonly employed t
 
 <h2>What is the GARCH Model?</h2>
 
-<p>In most financial time series, including the exchange, OLS's required assumptions are not met: that is, their estimated residuals are not constant, and their variance is not constant.
-    This is where the GARCH model comes in. Its basic assumption is that variance is conditional to time. 
+<p> GARCH stands for Generalized Autoregressive Conditional Heteroskedasticity.
+     Its basic assumption is that variance is conditional on time. 
     By assuming a functional relationship between the variance and its past values, the GARCH model can estimate the variance itself. And hence, be used to forecast the exchange rate.</p>
      </p>
 
 <p>Think of this: if a variation is time-dependent then yesterday’s variance is probably affecting today’s variance. 
-    Maybe the variance of the exchange rate two days ago also is still reflected on todays variation.</p>
+    Maybe the variance of the exchange rate two days ago also is still reflected on today's variation.</p>
 
-<p>The GARCH model is basically estimating the weight of past variances and error terms on current variance. Hence we can define the variance today as \( r_t \) as a constant mean \( \mu \) plus a time-dependent error term \( \epsilon_t \):</p>
+<p>Therefore the GARCH model is basically estimating the weight of past variances and error terms on current variance.
+     Defininge the exchange rate as \( r_t \), we can say that its value is determined by a constant mean \( \mu \) plus a time-dependent error term \( \epsilon_t \):</p>
 
 <p>\[ r_t = \mu + \epsilon_t \]</p>
 
-<p>This error, however, is not constant; it is conditional on time and its previous values such that:</p>
+<p>This error (or random-walk), however, is not constant; it is conditional on time and its previous values such that:</p>
 
 <p>\[ \epsilon_t = \sigma_t z_t, \quad z_t \sim \text{i.i.d. }(0,1) \]</p>
 
 <p>And most importantly, this \( \sigma_t \) - the variance itself - is defined as:</p>
 
-<p>\[ \sigma_t^2 = \omega + \sum_{i=1}^{p} \alpha_i \epsilon_{t-i}^2 + \sum_{j=1}^{q}\beta_j\sigma_{t-j}^2 \]></h2>
-
-Notice that apart from past variance, the error itself is also included in the equation, meaning that past (squared) shocks, still influence current variance.
+<p>\[ \sigma_t^2 = \omega + \sum_{i=1}^{p} \alpha_i \epsilon_{t-i}^2 + \sum_{j=1}^{q}\beta_j\sigma_{t-j}^2 \]</h2>
+    
+    Notice that apart from past variance, the error term itself is also included in the equation, meaning that past (squared) shocks, still influence current variance.
 
 <p>The weights on this equation are, naturally, the \( \alpha_i \) and \( \beta_j \). Whereas \( \omega \) is a constant intercept</p>
 
@@ -96,8 +97,9 @@ Notice that apart from past variance, the error itself is also included in the e
 <h2>Let’s fit it to the data?</h2>
 
 
-<p>For this post, I have used the Brazilian Real to US Dollar exchange rate. The data is available at the Central Bank of Brazil website.
-     The data is daily and spans from 2024-01-01 until the last available data (2025-01-07) .</p>
+<p>For this post, I have used the Brazilian Real to US Dollar exchange rate. 
+    The data is available at the Central Bank of Brazil website (Series N.10813).
+     The data is daily and, for the current problem, spans from 2024-01-01 until the last available data (2025-01-07) .</p>
 
 
 <p>Since the ER was clearly non stationary AND we are not estimating its level but its variance, we will use the daily difference as our estimand \( \Delta r_t \).</p>   
@@ -106,11 +108,13 @@ Notice that apart from past variance, the error itself is also included in the e
 
 <p>First, let's have a look at the data over time, and how its variance behaves.</p>
 
+<p> The left plot shows us the level of the BRZ/USD during 2024. The right plot shows us its variance and the variance's standard deviation over time: </p>
+
 
 <a name="er_eda_1"></a>
 <div align="center">
     <figure>
-        <iframe src="images/er_eda_1.png" height="600" width="1230" style="display:block;"></iframe>
+        <iframe src="images/er_eda_1.png" height="600" width="800" style="display:block;"></iframe>
         <figcaption><strong>Fig. 1 - Exchange Rate Variation and Standard Deviation (%/Units)</strong></figcaption>
     </figure>
 </div>
@@ -119,8 +123,8 @@ Notice that apart from past variance, the error itself is also included in the e
 It is clear that:
 <enumerate>
     <li> The exchange rate is non-stationary, with a clear upward trend - non constant mean</li>
-    <li> The difference of the exchange rate is also non-stationary, with a clear upward trend</li>
-    <li> The standard deviation of the exchange rate is not constant, with what looks like a upward trend</li>
+    <li> The standard deviation of the difference of the exchange rate is also non-stationary, with a clear upward trend</li>
+    <li> It seems that the ER difference itself changes over time - non constant variance - without any clear trend, however.</li>
 
 This means that the GARCH approach does seem appropriate for the data at hand.
  But how good can a model soleley based on past variances and errors be at predicting the exchange rate?</p>
@@ -128,7 +132,7 @@ This means that the GARCH approach does seem appropriate for the data at hand.
 
  When setting up the model, we have to define the number of lags for the variance and the error terms. 
  This is done by setting the \( p \) and \( q \) parameters. I have created an algorithm to estimate the combination
- of different possibilities of values (1, 10 for each parameter) and selected the one which minimized errors (residuals).
+ of different possibilities of values (1 to 5 10 for each parameter) and selected the one which minimized errors (residuals).
 
  <p> Since our goal is to forecast UNSEEN data, I have trained a model with half of the observations (until 2025-06-30).
     The models's results are presented below:</p>
@@ -142,9 +146,9 @@ This means that the GARCH approach does seem appropriate for the data at hand.
     </figure>
 </div>
 
-We can see that past error terms are present at one level , our \( \alpha_1 \) coefficient,
- whereas past variances are represented by one leveltoo, our \( \beta_1 \) coefficient. 
- Despite the error minimization specification, we can see that  \beta_1 is not statistically significant.
+We can see that past error terms are present at two levels , represented by \( \alpha_1 \) and \( \alpha_2\) coefficients,
+ whereas past variances are represented by one level too, our \( \beta_1 \) coefficient.  
+ Despite the error minimization specification, we can see that both \(\beta_1\) and \(\alpha_2\) are not statistically significant.
 
 <p>A practical way to validate this result is by simply plotting the autocorrelation function (ACF) of the exchange rate variance change itself.
  This function provides the correlation between a value in t against a value in t-1, t-2, t-3, and so on. 

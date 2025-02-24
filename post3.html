@@ -99,7 +99,7 @@ Although not necessarily the most sophisticated, this method commonly employed t
 
 <p>For this post, I have used the Brazilian Real to US Dollar exchange rate. 
     The data is available at the Central Bank of Brazil website (Series N.10813).
-     The data is daily and, for the current problem, spans from 2024-01-01 until the last available data (2025-01-07) .</p>
+     The data is daily and, for the current problem, spans from 2024-01-01 until the last available data (2025-01-07).</p>
 
 
 <p>Since the ER was clearly non stationary AND we are not estimating its level but its variance, we will use the daily difference as our estimand \( \Delta r_t \).</p>   
@@ -122,17 +122,19 @@ Although not necessarily the most sophisticated, this method commonly employed t
 
 It is clear that:
 <enumerate>
-    <li> The exchange rate is non-stationary, with a clear upward trend - non constant mean</li>
-    <li> The standard deviation of the difference of the exchange rate is also non-stationary, with a clear upward trend</li>
-    <li> It seems that the ER difference itself changes over time - non constant variance - without any clear trend, however.</li>
+    <li> The exchange rate is non-stationary, with a clear upward trend - non constant mean;</li>
+    <li> The standard deviation of the difference of the exchange rate is also non-stationary, with a clear upward trend;</li>
+    <li> It seems that the ER difference itself changes over time - non constant variance - without any clear trend, however;</li>
+    <li> The standard deviation level is higher than \( \Delta r_t \) itself; </li>
 
-This means that the GARCH approach does seem appropriate for the data at hand.
+
+<p> This means that the GARCH approach does seem appropriate for the data at hand.
  But how good can a model soleley based on past variances and errors be at predicting the exchange rate?</p>
 
 
- When setting up the model, we have to define the number of lags for the variance and the error terms. 
+ <p>When setting up the model, we have to define the number of lags for the variance and the error terms. 
  This is done by setting the \( p \) and \( q \) parameters. I have created an algorithm to estimate the combination
- of different possibilities of values (1 to 5 10 for each parameter) and selected the one which minimized errors (residuals).
+ of different possibilities of values (1 to 5 10 for each parameter) and selected the one which minimized errors (residuals).</p>
 
  <p> Since our goal is to forecast UNSEEN data, I have trained a model with half of the observations (until 2025-06-30).
     The models's results are presented below:</p>
@@ -172,8 +174,61 @@ As expected, the ACF shows a clear correlation between the exchange rate at time
 Finally, we saw that this result was corroborated by the ACF function. What about the model's hability to forecast?</p>
 </p> 
  
+<h2>Forecasting the Exchange Rate</h2>
 
+<p> Having estimated our model I have forecasted the exchange rate variance for the second half of 2024 and early 2025 (2025-01-07).
+    The results are presented below:</p>
+
+    <a name="forecast_er"></a>
+    <div align="center">
+        <figure style="text-align: center; margin: 2;">
+            <img src="images/forecast_tx.png" style="max-width: 100%; height: auto; display: block; margin: auto;">
+            <figcaption style="margin-top: 5px; font-size: 16px;"><strong>Fig. 4 - ER Variance Prediction</strong></figcaption>
+        </figure>
+    </div>
+    
+<p> The forecasted variance is presented in the plot above. The blue line represents the training set variance, whereas the dotted red line represents the forecasted rate of return based on the variance.
+    The rate of return is calculated as the square root of the estimated variance plus the estimated mean. The Black line represents the observed ER difference series \( \Delta r_t \).
+    We can see that the estimated value, however close to the observed mean, is still far from the observed series.
+    This is mostly due to the low variability of the estimated series. In fact, for the whole estimated period the estimated series variance is lower than 1% of the observed one.
+    This could be due to a model's misspecification or the fact that the model is not able to capture the series' variability.</p>
+</p>
  
+    </p>
+ 
+
+    <a name="forecast_hist"></a>
+    <div align="center">
+        <figure style="text-align: center; margin: 2;">
+            <img src="images/estimates_histogram.png" style="max-width: 100%; height: auto; display: block; margin: auto;">
+            <figcaption style="margin-top: 5px; font-size: 16px;"><strong>Fig. 5 - Forecasted Series Estimates x Observed Series</strong></figcaption>
+        </figure>
+    </div>
+
+
+<p> We can see that the estimates are very close to its mean (high kurtosis).In fact the estimated ER change standard deviation is less than 1% the size of the actual series. 
+    In other words, the model is not able to capture the series' variability. But what about its level? The GARCH model, as explained, earlier is fitting the series' variance.
+    To make this estimate comparable to the ER itself I have calculated the estimated level as model's estimates plus the last observed ER level value.
+</p>
+
+<p>In order to make this result comparable, I have created other two models:</p>
+
+<enumerate>
+    <li> The Facebooks's algorithm Prophet: used here as a univariate problem. ;</li>
+    <li> A Random Model: composed of random normal observations based on the series' last observed values (mean) and its mean variance</li>
+
+The results are presented below:</p>
+
+
+<a name="forecast_level"></a>
+<div align="center">
+    <figure style="text-align: center; margin: 2;">
+        <img src="images/forecast_level.png" style="max-width: 100%; height: auto; display: block; margin: auto;">
+        <figcaption style="margin-top: 5px; font-size: 16px;"><strong>Fig. 6 - Forecasted Series Estimates x Observed Series in Levels</strong></figcaption>
+    </figure>
+</div>
+
+
 
 </article>
 </div>
